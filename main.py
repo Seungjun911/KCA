@@ -111,7 +111,7 @@ if st.session_state.show_results:
         font-weight: bold;
     }
     </style>
-    <div class="result-header">------------------------------입력 정보------------------------------</div>
+    <div class="result-header">ㅡ입력 정보ㅡ</div>
     """, unsafe_allow_html=True)
     
     st.write(f"무선국종: {st.session_state.category}")
@@ -148,7 +148,7 @@ if st.session_state.show_results:
         font-weight: bold;
     }
     </style>
-    <div class="result-header">------------------------------계산 결과------------------------------</div>
+    <div class="result-header">ㅡ계산 결과ㅡ</div>
     """, unsafe_allow_html=True)
     
     # category 값에 따라 조건적으로 텍스트 추가 (시설자)
