@@ -32,19 +32,103 @@ st.session_state.subcategory = st.selectbox(
 
 st.session_state.output = st.text_input('출력 (W)')
 st.session_state.frequency = st.text_input('주파수 (Hz)')
-st.session_state.waveform = st.text_input('전파형식')
+st.session_state.waveform = st.text_input('전파형식(대역폭+변조방식)')
+
+def get_waveform_description(waveform):
+    waveform = waveform.upper()[-3:]
+    
+    # 설명 사전
+    firstCharDescriptions = {
+        'N': "무변조파",
+        'A': "양측파대",
+        'H': "단측파대의 전반송파",
+        'R': "단측파대의 저감 또는 가변레벨 반송파",
+        'J': "단측파대의 억압반송파",
+        'B': "독립측파대",
+        'C': "잔류측파대",
+        'F': "주파수변조(각)",
+        'G': "위상변조(각)",
+        'D': "동시 또는 순서에 따라 진폭과 각변조",
+        'P': "무변조 연속펄스",
+        'K': "진폭변조",
+        'L': "폭(기간)변조",
+        'M': "위치(위상)변조",
+        'Q': "펄스기간 중 각변조",
+        'V': "변조 조합 또는 다른 방법",
+        'W': "규정된 것 외의 조합변조",
+        'X': "규정된 것 외의 변조"
+    }
+    
+    secondCharDescriptions = {
+        '0': "무변조",
+        '1': "부반송파를 사용하지 않는 디지털 1개 채널",
+        '2': "부반송파를 사용하는 디지털 1개 채널",
+        '3': "아날로그 1개 채널",
+        '7': "디지털 2개 채널",
+        '8': "아날로그 2개 채널",
+        '9': "아날로그+디지털",
+        'X': "규정된 것 외의 형태"
+    }
+    
+    thirdCharDescriptions = {
+        'N': "정보송출 없음",
+        'A': "전신: 가청수신용",
+        'B': "전신: 자동수신용",
+        'C': "팩시밀리",
+        'D': "데이터, 비가청",
+        'E': "전화",
+        'F': "텔레비전(비디오)",
+        'W': "2개 이상의 조합",
+        'X': "규정된 것 외의 형태"
+    }
+    
+    if len(waveform) != 3:
+        return "잘못된 전파형식"
+    
+    firstDescription = firstCharDescriptions.get(waveform[0], "알 수 없음")
+    secondDescription = secondCharDescriptions.get(waveform[1], "알 수 없음")
+    thirdDescription = thirdCharDescriptions.get(waveform[2], "알 수 없음")
+    
+    # 설명을 쉼표로 구분하여 반환
+    return f"{firstDescription}, {secondDescription}, {thirdDescription}"
 
 if st.button('계산하기'):
     st.session_state.show_results = True
 
-# 계산 결과 표시
+
+
+
+
+
+
+
+
+
+
+# 결과 표시 로직
 if st.session_state.show_results:
-    st.title('계산 결과')
+    st.subheader('입력 결과')
     st.write(f"무선국종: {st.session_state.category}")
     st.write(f"세부장치: {st.session_state.subcategory}")
     st.write(f"출력: {st.session_state.output} W")
-    st.write(f"주파수: {st.session_state.frequency} Hz")
-    st.write(f"전파형식: {st.session_state.waveform}")
+
+    # 주파수 단위 변환
+    try:
+        frequency_value = int(st.session_state.frequency)
+        if frequency_value >= 1_000_000:
+            frequency_display = f"{frequency_value / 1_000_000} MHz"
+        elif frequency_value >= 1_000:
+            frequency_display = f"{frequency_value / 1_000} kHz"
+        else:
+            frequency_display = f"{frequency_value} Hz"
+        st.write(f"주파수: {frequency_display}")
+    except ValueError:
+        st.error("주파수는 숫자로 입력해야 합니다.")
+
+    # 전파형식 설명 추가
+    description = get_waveform_description(st.session_state.waveform)
+    st.write(f"전파형식 설명: {description}")
     
+    # "접기" 버튼
     if st.button("접기"):
         st.session_state.show_results = False
