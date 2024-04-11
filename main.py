@@ -179,7 +179,7 @@ if st.session_state.show_results:
     if st.session_state.category in ['41.선박국', '42.의무선박국', '92.아마추어국']:
 
     # HTML로 스타일링된 메시지와 다운로드 버튼
-        download_url = 'https://drive.google.com/uc?export=download&id=1OwTkd1ajrTCSSdrmbW-W_CbkSXZxbn9g'
+        download_url = 'https://drive.google.com/file/d/1OwTkd1ajrTCSSdrmbW-W_CbkSXZxbn9g/view?usp=sharing'
         html_content = f"""
     <div style="display: flex; align-items: center;">
         <p style="font-size: 20px; font-weight: bold; margin: 0; margin-right: 10px;">※ 무선종사자 배치기준 참고</p>
