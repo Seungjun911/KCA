@@ -1,4 +1,5 @@
 import streamlit as st
+import numpy as np
 
 st.title('일반무선국 기술기준 Helper')
 
@@ -32,7 +33,7 @@ st.session_state.subcategory = st.selectbox(
 
 st.session_state.output = st.text_input('출력 (W)')
 st.session_state.frequency = st.text_input('주파수 (Hz)')
-st.session_state.waveform = st.text_input('전파형식(대역폭+변조방식)')
+st.session_state.waveform = st.text_input('전파형식(대역폭+변조방식)' , max_chars=8)
 
 def get_waveform_description(waveform):
     waveform = waveform.upper()[-3:]
@@ -89,18 +90,11 @@ def get_waveform_description(waveform):
     secondDescription = secondCharDescriptions.get(waveform[1], "알 수 없음")
     thirdDescription = thirdCharDescriptions.get(waveform[2], "알 수 없음")
     
-    # 설명을 쉼표로 구분하여 반환
-    return f"{firstDescription}, {secondDescription}, {thirdDescription}"
+    # 수정된 부분: 들여쓰기가 함수 내 다른 줄들과 일치하도록 조정
+    return f'<span style="color: red;">{firstDescription}</span>, <span style="color: green;">{secondDescription}</span>, <span style="color: blue;">{thirdDescription}</span>'
 
 if st.button('계산하기'):
     st.session_state.show_results = True
-
-
-
-
-
-
-
 
 
 
@@ -125,10 +119,45 @@ if st.session_state.show_results:
     except ValueError:
         st.error("주파수는 숫자로 입력해야 합니다.")
 
-    # 전파형식 설명 추가
-    description = get_waveform_description(st.session_state.waveform)
-    st.write(f"전파형식 설명: {description}")
+    # 전파형식 설명 추가, Markdown으로 처리
+    description_html = get_waveform_description(st.session_state.waveform)
+    st.markdown(f"전파형식: {description_html}", unsafe_allow_html=True)
+
+if st.session_state.show_results:
+    st.subheader('계산 결과')
+
     
     # "접기" 버튼
-    if st.button("접기"):
+if st.button("접기"):
         st.session_state.show_results = False
+        
+        
+        
+        
+st.title('dBm - W 계산기')
+# 사용자 입력 받기
+dbm_value = st.number_input('dBm 값을 입력하세요:', value=0.0)
+
+# dBm을 W로 변환하는 함수
+def dbm_to_watt(dbm):
+    return 10 ** (dbm / 10) * 0.001
+
+# 변환 결과 계산
+watt_value = dbm_to_watt(dbm_value)
+
+# 결과 출력
+st.write(f"{dbm_value} dBm = {watt_value} W")
+
+st.title('W - dBm 계산기')
+# 사용자 입력 받기
+watt_value = st.number_input('W (와트) 값을 입력하세요:', value=0.0, format="%f")
+
+# W를 dBm으로 변환하는 함수
+def watt_to_dbm(watt):
+    return 10 * np.log10(watt * 1000)
+
+# 변환 결과 계산
+dbm_value = watt_to_dbm(watt_value)
+
+# 결과 출력
+st.write(f"{watt_value} W = {dbm_value} dBm")
