@@ -1,5 +1,5 @@
 import streamlit as st
-import numpy as np
+import math
 
 st.title('일반무선국 기술기준 Helper')
 
@@ -154,7 +154,10 @@ watt_value = st.number_input('W (와트) 값을 입력하세요:', value=0.0, fo
 
 # W를 dBm으로 변환하는 함수
 def watt_to_dbm(watt):
-    return 10 * np.log10(watt * 1000)
+    if watt > 0:
+        return 10 * math.log10(watt * 1000)
+    else:
+        return '0'
 
 # 변환 결과 계산
 dbm_value = watt_to_dbm(watt_value)
