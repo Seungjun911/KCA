@@ -33,7 +33,7 @@ st.session_state.subcategory = st.selectbox(
 
 output = st.number_input('출력값을 입력하세요:', value=0)
 frequency = st.number_input('주파수를 입력하세요(Hz):', value=0)
-st.session_state.waveform = st.text_input('전파형식(대역폭+변조방식)' , max_chars=8)
+st.session_state.waveform = st.text_input('전파형식(예:8k5f3e 등)' , max_chars=8)
 
 def get_waveform_description(waveform):
     waveform = waveform.upper()[-3:]
@@ -101,7 +101,19 @@ if st.button('계산하기'):
 
 # 결과 표시 로직
 if st.session_state.show_results:
-    st.subheader('입력 결과')
+# HTML을 사용하여 스타일링된 서브헤더
+    st.markdown("""
+    <style>
+    .result-header {
+        color: red;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    </style>
+    <div class="result-header">------------------------------입력 정보------------------------------</div>
+    """, unsafe_allow_html=True)
+    
     st.write(f"무선국종: {st.session_state.category}")
     st.write(f"세부장치: {st.session_state.subcategory}")
     st.write(f"출력: {output} W")
@@ -125,20 +137,81 @@ if st.session_state.show_results:
     description_html = get_waveform_description(st.session_state.waveform)
     st.markdown(f"전파형식: {description_html}", unsafe_allow_html=True)
 
-if st.session_state.show_results:
-    st.subheader('계산 결과')
 
+# HTML을 사용하여 스타일링된 서브헤더
+    st.markdown("""
+    <style>
+    .result-header {
+        color: red;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    </style>
+    <div class="result-header">------------------------------계산 결과------------------------------</div>
+    """, unsafe_allow_html=True)
     
-    # "접기" 버튼
-if st.button("접기"):
+    # category 값에 따라 조건적으로 텍스트 추가 (시설자)
+    if st.session_state.category in ['41.선박국', '42.의무선박국', '44.육상이동국', '92.아마추어국', '94.간이무선국']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 시설자</p>", unsafe_allow_html=True)
+    
+     # category 값에 따라 조건적으로 텍스트 추가 (설치장소)
+    if st.session_state.category in ['41.선박국', '42.의무선박국', '44.육상이동국', '92.아마추어국', '94.간이무선국']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 설치장소</p>", unsafe_allow_html=True)
+            
+    # category 값에 따라 조건적으로 텍스트 추가 (기기형식)
+    if st.session_state.category in ['41.선박국', '42.의무선박국', '44.육상이동국', '92.아마추어국', '94.간이무선국']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 기기형식</p>", unsafe_allow_html=True)   
+            
+    # category 값에 따라 조건적으로 텍스트 추가 (전원설비)
+    if st.session_state.category in ['41.선박국', '42.의무선박국', '44.육상이동국', '92.아마추어국', '94.간이무선국']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 전원설비</p>", unsafe_allow_html=True)      
+            
+    # category 값에 따라 조건적으로 텍스트 추가 (안테나)
+    if st.session_state.category in ['41.선박국', '42.의무선박국', '44.육상이동국', '92.아마추어국', '94.간이무선국']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 안테나</p>", unsafe_allow_html=True)      
+            
+    # category 값에 따라 조건적으로 텍스트 추가 (보호장치)            
+    if output > 10:
+        st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 보호장치(10W초과)</p>", unsafe_allow_html=True)
+    
+    # 선택된 카테고리에 따른 메시지와 다운로드 버튼 표시
+    if st.session_state.category in ['41.선박국', '42.의무선박국', '92.아마추어국']:
+
+    # HTML로 스타일링된 메시지와 다운로드 버튼
+        download_url = 'https://drive.google.com/uc?export=download&id=1OwTkd1ajrTCSSdrmbW-W_CbkSXZxbn9g'
+        html_content = f"""
+    <div style="display: flex; align-items: center;">
+        <p style="font-size: 20px; font-weight: bold; margin: 0; margin-right: 10px;">※ 무선종사자 배치기준 참고</p>
+        <a href="{download_url}" download>
+            <button style="color: white; background-color: #4CAF50; padding: 10px 24px; border-radius: 8px; border: none; cursor: pointer;">
+                배치기준 다운로드
+            </button>
+        </a>
+    </div>
+    """
+
+    st.markdown(html_content, unsafe_allow_html=True)
+    
+    
+    
+    
+    
+    
+    # "접기" 버튼 - 이 부분이 수정되었습니다.
+    if st.button("접기"):
         st.session_state.show_results = False
+
         
         
+        
+        
+  
         
         
 st.title('dBm - W 계산기')
 # 사용자 입력 받기
-dbm_value = st.number_input('dBm 값을 입력하세요:', value=0.0)
+dbm_value = st.number_input('dBm 값을 입력하세요:', value=0)
 
 # dBm을 W로 변환하는 함수
 def dbm_to_watt(dbm):
