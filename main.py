@@ -17,9 +17,9 @@ st.session_state.category = st.selectbox(
 options = {
     '41': ['VHF(DSC)', 'MF/HF', 'MF/HF(DSC)', 'D-MF/HF', 'EPIRB', 'AIS', 'TWO-WAY'],
     '42': ['VHF(DSC)', 'MF/HF', 'MF/HF(DSC)', 'D-MF/HF', 'EPIRB', 'AIS', 'TWO-WAY'],
-    '44': ['TRS', '기타'],
+    '44': ['기타', 'TRS'],
     '92': ['기타'],
-    '94': ['마을방송', '기타'],
+    '94': ['기타', '마을방송'],
     '': ['먼저 무선국종을 선택하세요']  # 기본값
 }
 
@@ -190,13 +190,29 @@ if st.session_state.show_results:
         </a>
     </div>
     """
-
-    st.markdown(html_content, unsafe_allow_html=True)
+        st.markdown(html_content, unsafe_allow_html=True)
     
-    
-    
-    
-    
+     # category 값에 따라 조건적으로 텍스트 추가 (예비전원)
+    if st.session_state.category in ['41.선박국', '42.의무선박국']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 예비전원</p>", unsafe_allow_html=True)      
+               
+     # category 값에 따라 조건적으로 텍스트 추가 (의사안테나및 비상등)
+    if st.session_state.category in ['41.선박국', '42.의무선박국']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 의사안테나및 비상등</p>", unsafe_allow_html=True)      
+               
+     # category2 값에 따라 조건적으로 텍스트 추가 (식별부호)
+    if st.session_state.subcategory in ['VHF(DSC)', 'EPIRB', 'MF/HF(DSC)']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 식별부호</p>", unsafe_allow_html=True)      
+               
+     # category2 값에 따라 조건적으로 텍스트 추가 (DSC위치정보확인)
+    if st.session_state.subcategory in ['VHF(DSC)', 'MF/HF(DSC)']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ DSC위치정보확인</p>", unsafe_allow_html=True)      
+                       
+      # category2 값에 따라 조건적으로 텍스트 추가 (VHF-GPS)
+    if st.session_state.subcategory in ['VHF(DSC)']:
+            st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ VHF-GPS</p>", unsafe_allow_html=True)      
+                       
+       
     
     # "접기" 버튼 - 이 부분이 수정되었습니다.
     if st.button("접기"):
