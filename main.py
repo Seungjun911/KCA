@@ -25,14 +25,14 @@ options = {
 
 # 무선국종에 따른 세부장치 옵션 설정
 selected_category = st.session_state.category.split('.')[0]
-st.session_state.subcategory_options = options.get(selected_category, ['먼저 카테고리를 선택하세요'])
+st.session_state.subcategory_options = options.get(selected_category, ['먼저 무선국종을 선택하세요'])
 st.session_state.subcategory = st.selectbox(
     '세부장치:',
     st.session_state.subcategory_options
 )
 
-st.session_state.output = st.text_input('출력 (W)')
-st.session_state.frequency = st.text_input('주파수 (Hz)')
+output = st.number_input('출력값을 입력하세요:', value=0)
+frequency = st.number_input('주파수를 입력하세요(Hz):', value=0)
 st.session_state.waveform = st.text_input('전파형식(대역폭+변조방식)' , max_chars=8)
 
 def get_waveform_description(waveform):
@@ -104,12 +104,14 @@ if st.session_state.show_results:
     st.subheader('입력 결과')
     st.write(f"무선국종: {st.session_state.category}")
     st.write(f"세부장치: {st.session_state.subcategory}")
-    st.write(f"출력: {st.session_state.output} W")
+    st.write(f"출력: {output} W")
 
     # 주파수 단위 변환
     try:
-        frequency_value = int(st.session_state.frequency)
-        if frequency_value >= 1_000_000:
+        frequency_value = int(frequency)
+        if frequency_value >= 1_000_000_000:
+            frequency_display = f"{frequency_value / 1_000_000_000} GHz"
+        elif frequency_value >= 1_000_000:
             frequency_display = f"{frequency_value / 1_000_000} MHz"
         elif frequency_value >= 1_000:
             frequency_display = f"{frequency_value / 1_000} kHz"
