@@ -48,28 +48,35 @@ def input_output_frequency_waveform():
     output = st.number_input('출력값을 입력하세요:', value=0)
 
     st.write("주파수를 입력하세요 (Hz):")
-    initial_frequency = st.number_input('값:', value=0.0000, step=0.1)
+    initial_frequency = st.number_input('값:', value=0.0000, step=0.1, format="%.4f")
 
-    # 단위 선택 버튼
-    col1, col2, col3, col4 = st.columns(4)
+    # 커스텀 CSS를 통해 버튼을 가로로 유지
+    st.markdown("""
+        <style>
+        .stButton>button {
+            min-width: 100px;
+            width: 100%;
+            padding: 8px 16px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # 단위 선택 버튼, 고정 너비를 지정해 가로 배치 유지
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     units = ['GHz', 'MHz', 'kHz', 'Hz']
-    for i, unit in zip([col1, col2, col3, col4], units):
-        with i:
+    for i, unit in enumerate(units):
+        with [col1, col2, col3, col4][i]:
             if st.button(unit):
-                frequency = convert_to_hz(initial_frequency, unit)
+                frequency = initial_frequency * [1e9, 1e6, 1e3, 1][i]
                 st.session_state.frequency = frequency  # 세션 상태에 저장
 
     # 세션 상태에 주파수가 저장되었다면, 그 값을 사용
-    if 'frequency' in st.session_state:
-        st.write(f"입력된 주파수: {st.session_state.frequency} Hz")
-        frequency = st.session_state.frequency  # 세션 상태에서 주파수를 가져옴
-    else:
-        frequency = initial_frequency  # 세션 상태에 없으면 초기 입력값 사용
+    frequency = st.session_state.get('frequency', initial_frequency)
+    st.write(f"입력된 주파수: {frequency} Hz")
 
     waveform = st.text_input('전파형식(예:8k5f3e 등)', max_chars=8)
 
     return output, frequency, waveform
-
 
 
 def display_results(category, subcategory, output, frequency, waveform):
