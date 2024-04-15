@@ -1,7 +1,6 @@
 import streamlit as st
 import math
 
-
 def setup_initial_state():
     if "show_results" not in st.session_state:
         st.session_state.show_results = False
@@ -31,25 +30,61 @@ def select_subcategory(category):
     )
     return subcategory
 
+def convert_to_hz(value, unit):
+    if unit == 'GHz':
+        return value * 1e9
+    elif unit == 'MHz':
+        return value * 1e6
+    elif unit == 'kHz':
+        return value * 1e3
+    elif unit == 'Hz':
+        return value
+    else:
+        return 0
+    
 
 def input_output_frequency_waveform():
+    """출력값, 주파수, 전파형식을 입력받습니다."""
     output = st.number_input('출력값을 입력하세요:', value=0)
-    frequency = st.number_input('주파수를 입력하세요(Hz):', value=0)
+
+    st.write("주파수를 입력하세요 (Hz):")
+    initial_frequency = st.number_input('값:', value=0.0000, step=0.1)
+
+    # 단위 선택 버튼
+    col1, col2, col3, col4 = st.columns(4)
+    units = ['GHz', 'MHz', 'kHz', 'Hz']
+    for i, unit in zip([col1, col2, col3, col4], units):
+        with i:
+            if st.button(unit):
+                frequency = convert_to_hz(initial_frequency, unit)
+                st.session_state.frequency = frequency  # 세션 상태에 저장
+
+    # 세션 상태에 주파수가 저장되었다면, 그 값을 사용
+    if 'frequency' in st.session_state:
+        st.write(f"입력된 주파수: {st.session_state.frequency} Hz")
+        frequency = st.session_state.frequency  # 세션 상태에서 주파수를 가져옴
+    else:
+        frequency = initial_frequency  # 세션 상태에 없으면 초기 입력값 사용
+
     waveform = st.text_input('전파형식(예:8k5f3e 등)', max_chars=8)
+
     return output, frequency, waveform
 
 
-def calculate_button():
-    if st.button('계산하기'):
-        st.session_state.show_results = True
-###############결과 화면
+
 def display_results(category, subcategory, output, frequency, waveform):
     if st.session_state.show_results:
-        show_input_info(category, subcategory, output, frequency, waveform)
-        Contrast(category, subcategory, output)
-        Performance(category, subcategory, output, frequency, waveform)
-        if st.button("접기"):
-            st.session_state.show_results = False
+        # Waveform 처리
+        extracted_waveform = extract_and_uppercase_waveform(waveform)
+
+
+def extract_and_uppercase_waveform(waveform):
+    waveform_part = waveform[:-3]
+    waveform_upper = waveform_part.upper()
+    return waveform_upper
+
+
+            
 
 def show_input_info(category, subcategory, output, frequency, waveform):
     st.markdown("""
@@ -118,7 +153,7 @@ def Contrast(category, subcategory, output):
         st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ DSC위치정보확인</p>", unsafe_allow_html=True)
 
 
-def Performance(category, subcategory, output, frequency, waveform):
+def Performance(category, subcategory, output, frequency, waveform, extracted_waveform):
     st.markdown("<div class='result-header'>✅성능 결과✅</div>", unsafe_allow_html=True)
 
 #############################################출력
@@ -163,10 +198,15 @@ def Performance(category, subcategory, output, frequency, waveform):
 
 
 #############################################대역폭
-
-
-
-
+    if st.session_state.show_results:
+        # Waveform 값이 비어있지 않은 경우에만 처리
+        if waveform.strip():  # .strip()을 사용하여 공백만 있는 입력도 걸러냄
+            extracted_waveform = extract_and_uppercase_waveform(waveform)
+            # 대역폭 표시
+            st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>대역폭 : {extracted_waveform}</p>", unsafe_allow_html=True)
+        else:
+            # Waveform 값이 비어있으면 메시지 표시
+            st.markdown("<p style='font-size: 20px; font-weight: bold; color: red;'>전파형식을 입력해주세요.</p>", unsafe_allow_html=True)
 
 
 
@@ -223,7 +263,25 @@ def get_waveform_description(waveform):
     
     return f'<span style="color: red;">{firstDescription}</span>, <span style="color: green;">{secondDescription}</span>, <span style="color: blue;">{thirdDescription}</span>'
 
-
+def calculate_button():
+    if st.button('결과 열기', key='open'):
+        st.session_state.show_results = True
+###############결과 화면
+def display_results(category, subcategory, output, frequency, waveform):
+    if st.session_state.show_results:
+        # Waveform 처리
+        extracted_waveform = extract_and_uppercase_waveform(waveform)
+        
+        # 입력 정보와 추가 정보 표시
+        show_input_info(category, subcategory, output, frequency, waveform)
+        Contrast(category, subcategory, output)
+        
+        # 성능 결과 표시, 이제 extracted_waveform을 정확히 전달
+        Performance(category, subcategory, output, frequency, waveform, extracted_waveform)
+ 
+        # 접기 버튼
+        if st.button("접기", key='close'):
+            st.session_state.show_results = False
 
 
 def main():
@@ -232,11 +290,9 @@ def main():
     category = select_category()
     subcategory = select_subcategory(category)
     output, frequency, waveform = input_output_frequency_waveform()
+
     calculate_button()
     display_results(category, subcategory, output, frequency, waveform)
-
-
-
 
     st.title('dBm - W 계산기')
     dbm_value = st.number_input('dBm 값을 입력하세요:', value=0)
