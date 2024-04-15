@@ -31,16 +31,18 @@ def select_subcategory(category):
     )
     return subcategory
 
+
 def input_output_frequency_waveform():
     output = st.number_input('출력값을 입력하세요:', value=0)
     frequency = st.number_input('주파수를 입력하세요(Hz):', value=0)
     waveform = st.text_input('전파형식(예:8k5f3e 등)', max_chars=8)
     return output, frequency, waveform
 
+
 def calculate_button():
     if st.button('계산하기'):
         st.session_state.show_results = True
-
+###############결과 화면
 def display_results(category, subcategory, output, frequency, waveform):
     if st.session_state.show_results:
         show_input_info(category, subcategory, output, frequency, waveform)
@@ -69,6 +71,7 @@ def show_input_info(category, subcategory, output, frequency, waveform):
     st.write(f"주파수: {frequency_display}")
     description_html = get_waveform_description(waveform)
     st.markdown(f"전파형식: {description_html}", unsafe_allow_html=True)
+
 
 
 def Contrast(category, subcategory, output):
@@ -160,10 +163,6 @@ def Performance(category, subcategory, output, frequency, waveform):
 
 
 #############################################대역폭
-
-
-
-
 
 
 
