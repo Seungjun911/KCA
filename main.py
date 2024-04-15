@@ -44,39 +44,44 @@ def convert_to_hz(value, unit):
     
 
 def input_output_frequency_waveform():
-    """출력값, 주파수, 전파형식을 입력받습니다."""
-    output = st.number_input('출력값을 입력하세요:', value=0)
-
+    output = st.number_input('출력값을 입력하세요:', value=0.0, step=1.0, format="%.1f")
     st.write("주파수를 입력하세요 (Hz):")
-    initial_frequency = st.number_input('값:', value=0.0000, step=0.1, format="%.4f")
 
-    # 커스텀 CSS를 통해 버튼을 가로로 유지
+    initial_frequency = st.number_input('센터주파수를 입력하세요:', value=0.0, step=1.0, format="%.1f")
+
+    # 전역 버튼 스타일 설정
     st.markdown("""
-        <style>
-        .stButton>button {
-            min-width: 100px;
-            width: 100%;
-            padding: 8px 16px;
-        }
-        </style>
+    <style>
+    .stButton>button {
+        min-width: -30px;  # 버튼의 최소 너비를 0으로 설정하여 강제로 한 줄에 유지
+        padding: 0.25em 0.5em;  /* 작은 패딩 */
+        font-size: 0.75em;      /* 작은 글꼴 크기 */
+        width: 100%;            /* 컬럼 너비에 맞춤 */
+    }
+    </style>
     """, unsafe_allow_html=True)
 
-    # 단위 선택 버튼, 고정 너비를 지정해 가로 배치 유지
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    # 단위 선택 버튼
+    col1, col2, col3, col4 = st.columns(4)
     units = ['GHz', 'MHz', 'kHz', 'Hz']
-    for i, unit in enumerate(units):
-        with [col1, col2, col3, col4][i]:
+    for i, unit in zip([col1, col2, col3, col4], units):
+        with i:
             if st.button(unit):
-                frequency = initial_frequency * [1e9, 1e6, 1e3, 1][i]
+                frequency = convert_to_hz(initial_frequency, unit)
                 st.session_state.frequency = frequency  # 세션 상태에 저장
 
     # 세션 상태에 주파수가 저장되었다면, 그 값을 사용
     frequency = st.session_state.get('frequency', initial_frequency)
-    st.write(f"입력된 주파수: {frequency} Hz")
+    frequency_display = format_frequency(frequency)
+    st.markdown(f"주파수: <span style='color: red;'>{frequency_display}</span>", unsafe_allow_html=True)
 
     waveform = st.text_input('전파형식(예:8k5f3e 등)', max_chars=8)
 
     return output, frequency, waveform
+
+
+
+
 
 
 def display_results(category, subcategory, output, frequency, waveform):
@@ -117,7 +122,18 @@ def show_input_info(category, subcategory, output, frequency, waveform):
 
 
 def Contrast(category, subcategory, output):
-    st.markdown("<div class='result-header'>✅대조 결과✅</div>", unsafe_allow_html=True)
+    st.markdown("""
+<style>
+.centered-success {
+    background-color: #28a745;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+</style>
+<div class="centered-success">✅ 대조 결과 ✅</div>
+""", unsafe_allow_html=True)
 
     # 시설자에 대한 정보
     if category in ['41.선박국', '42.의무선박국', '44.육상이동국', '92.아마추어국', '94.간이무선국']:
@@ -161,7 +177,20 @@ def Contrast(category, subcategory, output):
 
 
 def Performance(category, subcategory, output, frequency, waveform, extracted_waveform):
-    st.markdown("<div class='result-header'>✅성능 결과✅</div>", unsafe_allow_html=True)
+    st.markdown("""
+<style>
+.centered-success {
+    background-color: #80C783;
+    color: black;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+</style>
+<div class="centered-success">✅ 성능 결과 ✅</div>
+""", unsafe_allow_html=True)
 
 #############################################출력
     # 아마추어국인 경우 출력 범위 계산 및 표시
@@ -292,6 +321,18 @@ def display_results(category, subcategory, output, frequency, waveform):
 
 
 def main():
+    st.markdown("""
+        <style>
+        .stApp {
+            background-image: url("https://i.ibb.co/7tQQp7K/1.jpg");
+            background-size: 30%;  /* 이미지 크기를 원래 크기의 50%로 설정 */
+            background-repeat: no-repeat;
+            background-position: left;  /* 이미지를 페이지의 중앙 상단에 배치 */
+            background-attachment: fixed;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    
     st.title('일반무선국 기술기준 Helper')
     setup_initial_state()
     category = select_category()
@@ -319,6 +360,7 @@ def watt_to_dbm(watt):
         return 10 * math.log10(watt * 1000)
     else:
         return '0'
+
 
 
 if __name__ == "__main__":
