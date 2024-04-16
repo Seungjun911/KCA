@@ -45,7 +45,6 @@ def convert_to_hz(value, unit):
 
 def input_output_frequency_waveform():
     output = st.number_input('출력값을 입력하세요:', value=0.0, step=1.0, format="%.1f")
-    st.write("주파수를 입력하세요 (Hz):")
 
     initial_frequency = st.number_input('센터주파수를 입력하세요:', value=0.0, step=1.0, format="%.1f")
 
@@ -197,7 +196,6 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
     if category == '92.아마추어국':
         calculated_output_range12 = output * 1.2  # 출력 최대 범위 계산
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>안테나 공급전력: 0W ~ {calculated_output_range12:.1f}W(하한없음 ~ 상한 20%)</p>", unsafe_allow_html=True )
-
     # 간이,육상
     if category in ['94.간이무선국', '44.육상이동국']:
         calculated_output_range05 = output * 0.5  # 출력 최소 범위 계산
@@ -222,12 +220,12 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
         calculated_output_range15 = output * 1.5  # 출력 최대 범위 계산
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>안테나 공급전력: {calculated_output_range08:.1f}W ~ {calculated_output_range15:.1f}W(하한80% ~ 상한 50%) // On-Air측정시 'ㅡ'처리</p>", unsafe_allow_html=True )
 
-    if subcategory in ["MF/HF", "MF/HF(DSC)"] and 1605000 < frequency < 3900000:
+    if subcategory in ["MF/HF", "MF/HF(DSC)"] and 1605000 < frequency <= 3900000:
         calculated_output_range08 = output * 0.8  # 출력 최대 범위 계산
         calculated_output_range11 = output * 1.1  # 출력 최대 범위 계산
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>안테나 공급전력: {calculated_output_range08:.1f}W ~ {calculated_output_range11:.1f}W(하한80% ~ 상한 10%)</p>", unsafe_allow_html=True )
 
-    if subcategory in ["MF/HF", "MF/HF(DSC)"] and 4000000 < frequency < 28500000:
+    if subcategory in ["MF/HF", "MF/HF(DSC)"] and 4000000 < frequency <= 28500000:
         calculated_output_range05 = output * 0.5  # 출력 최대 범위 계산
         calculated_output_range12 = output * 1.2  # 출력 최대 범위 계산
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>안테나 공급전력: {calculated_output_range05:.1f}W ~ {calculated_output_range12:.1f}W(하한50% ~ 상한 20%)</p>", unsafe_allow_html=True )
@@ -244,11 +242,15 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
             # Waveform 값이 비어있으면 메시지 표시
             st.markdown("<p style='font-size: 20px; font-weight: bold; color: red;'>전파형식을 입력해주세요.</p>", unsafe_allow_html=True)
 
+#############################################주파수편차
+    # EPIRB
+    if subcategory == 'EPIRB':
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: 기준 X 측정값 입력", unsafe_allow_html=True )
 
-
-
-
-
+    if category == "92.아마추어국" and 100000000 < frequency <= 470000000 and output > 1:
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: 1000Hz</p>", unsafe_allow_html=True)
+    else:
+        st.write(f"현재 주파수: {frequency} Hz, 현재 출력: {output} W (조건 불만족)")
 
 
 
@@ -321,17 +323,7 @@ def display_results(category, subcategory, output, frequency, waveform):
 
 
 def main():
-    st.markdown("""
-        <style>
-        .stApp {
-            background-image: url("https://i.ibb.co/7tQQp7K/1.jpg");
-            background-size: 30%;  /* 이미지 크기를 원래 크기의 50%로 설정 */
-            background-repeat: no-repeat;
-            background-position: left;  /* 이미지를 페이지의 중앙 상단에 배치 */
-            background-attachment: fixed;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+
     
     st.title('일반무선국 기술기준 Helper')
     setup_initial_state()
