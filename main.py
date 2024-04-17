@@ -322,6 +322,11 @@ def display_results(category, subcategory, output, frequency, waveform):
             st.session_state.show_results = False
 
 
+def setup_initial_state():
+    if 'show_calculators' not in st.session_state:
+        st.session_state['show_calculators'] = False
+    if 'show_results' not in st.session_state:
+        st.session_state['show_results'] = False
 def main():
 
     
@@ -334,16 +339,24 @@ def main():
     calculate_button()
     display_results(category, subcategory, output, frequency, waveform)
 
-    st.title('dBm - W 계산기')
-    dbm_value = st.number_input('dBm 값을 입력하세요:', value=0)
-    watt_value = dbm_to_watt(dbm_value)
-    st.write(f"{dbm_value} dBm = {watt_value} W")
 
-    st.title('W - dBm 계산기')
-    watt_value = st.number_input('W (와트) 값을 입력하세요:', value=0.0, format="%f")
-    dbm_value = watt_to_dbm(watt_value)
-    st.write(f"{watt_value} W = {dbm_value} dBm")
+   # 계산기 표시 제어 버튼
+    if st.button('계산기 열기'):
+        st.session_state.show_calculators = True
+    if st.button('계산기 숨기기'):
+        st.session_state.show_calculators = False
+        
+    if st.session_state.show_calculators:
+        st.title('dBm - W 계산기')
+        dbm_value = st.number_input('dBm 값을 입력하세요:', value=0)
+        watt_value = dbm_to_watt(dbm_value)
+        st.write(f"{dbm_value} dBm = {watt_value} W")
 
+        st.title('W - dBm 계산기')
+        watt_value = st.number_input('W (와트) 값을 입력하세요:', value=0.0, format="%f")
+        dbm_value = watt_to_dbm(watt_value)
+        st.write(f"{watt_value} W = {dbm_value} dBm")
+        
 def dbm_to_watt(dbm):
     return 10 ** (dbm / 10) * 0.001
 
