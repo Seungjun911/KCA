@@ -4,6 +4,12 @@ import math
 def setup_initial_state():
     if "show_results" not in st.session_state:
         st.session_state.show_results = False
+    if 'output' not in st.session_state:
+        st.session_state.output = 0.0
+    if 'frequency' not in st.session_state:
+        st.session_state.frequency = 0
+    if 'waveform' not in st.session_state:
+        st.session_state.waveform = ''
 
 def select_category():
     category = st.selectbox(
@@ -44,7 +50,7 @@ def convert_to_hz(value, unit):
     
 
 def input_output_frequency_waveform():
-    output = st.number_input('출력값을 입력하세요:', value=0.0, step=1.0, format="%.1f")
+    output = st.number_input('출력값을 입력하세요:', value=1.0, step=1.0, format="%.1f")
 
     initial_frequency = st.number_input('센터주파수를 입력하세요:', value=0.0, step=1.0, format="%.1f")
 
@@ -174,6 +180,7 @@ def Contrast(category, subcategory, output):
     if subcategory in ['VHF(DSC)', 'MF/HF(DSC)']:
         st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ DSC위치정보확인</p>", unsafe_allow_html=True)
 
+    
 
 def Performance(category, subcategory, output, frequency, waveform, extracted_waveform):
     st.markdown("""
@@ -190,7 +197,14 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
 </style>
 <div class="centered-success">✅ 성능 결과 ✅</div>
 """, unsafe_allow_html=True)
-
+    # waveform 길이 확인
+    if len(waveform) >= 2:
+        second_last_char = waveform[-2]
+    else:
+        # 길이가 부족할 경우 기본값 설정 또는 오류 메시지 처리
+        second_last_char = None  # 또는 적절한 기본값 설정
+    # 초기 final_result 설정
+    final_result = None
 #############################################출력
     # 아마추어국인 경우 출력 범위 계산 및 표시
     if category == '92.아마추어국':
@@ -238,19 +252,101 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
             extracted_waveform = extract_and_uppercase_waveform(waveform)
             # 대역폭 표시
             st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>대역폭 : {extracted_waveform}</p>", unsafe_allow_html=True)
-        else:
-            # Waveform 값이 비어있으면 메시지 표시
-            st.markdown("<p style='font-size: 20px; font-weight: bold; color: red;'>전파형식을 입력해주세요.</p>", unsafe_allow_html=True)
 
 #############################################주파수편차
     # EPIRB
     if subcategory == 'EPIRB':
-        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: 기준 X 측정값 입력", unsafe_allow_html=True )
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: 기준없음(측정값 입력)", unsafe_allow_html=True )
 
     if category == "92.아마추어국" and 100000000 < frequency <= 470000000 and output > 1:
-        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: 1000Hz</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±1000Hz(1W초과)</p>", unsafe_allow_html=True)
+
+    if category == "92.아마추어국" and 100000000 < frequency <= 470000000 and output <= 1:
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±500Hz(1W이하)</p>", unsafe_allow_html=True)
+
+    if category == "94.간이무선국" and second_last_char == '1' and 138000000 < frequency <= 174000000:
+        if output <= 2:
+            result_value = 6
+        else:
+            result_value = 8
+        final_result = frequency * result_value / 1000000
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>{result_value}</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+
+    if category == "94.간이무선국" and second_last_char == '1' and 335400000 < frequency <= 470000000:
+        if output <= 2:
+            result_value = 4
+        else:
+            result_value = 3
+        final_result = frequency * result_value / 1000000
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>{result_value}</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+
+    if category == "94.간이무선국" and 200000000 < frequency <= 335000000:
+        final_result = frequency * 20 / 1000000
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>20</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+
+    if category == "44.육상이동국" and 174000000 < frequency <= 235000000:
+        final_result = frequency * 15 / 1000000
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>15</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+    if category == "44.육상이동국" and 235000000 < frequency <= 335400000:
+        final_result = frequency * 7 / 1000000
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>7</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+    if category == "44.육상이동국" and 335400000 < frequency <= 470000000:
+        if output <= 2:
+            result_value = 4
+        else:
+            result_value = 3
+        final_result = frequency * result_value / 1000000
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>{result_value}</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+    if category == "44.육상이동국" and 138000000 < frequency <= 174000000:
+        if output <= 2:
+            result_value = 8
+        else:
+            result_value = 6
+        final_result = frequency * result_value / 1000000
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>{result_value}</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+
+        
+    if subcategory == 'MF/HF(DSC)'and 1606500 < frequency <= 28500000:
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±10Hz(DSC)", unsafe_allow_html=True )
+
+    if subcategory == 'MF/HF'and 4000000 < frequency <= 28500000:
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±50Hz(DSC)", unsafe_allow_html=True )
+
+    if subcategory == 'MF/HF'and 1606500 < frequency <= 4000000:
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±40Hz(DSC)", unsafe_allow_html=True )
+
+    if subcategory == 'AIS':
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±500Hz", unsafe_allow_html=True )
+
+    if subcategory == 'VHF(DSC)' or subcategory == 'TWO-WAY':
+        final_result = frequency * 10 / 1000000
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>10</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+
+
+####################################불요파
+    if category in ["92.아마추어국", "44.육상이동국"] or subcategory in ["VHF(DSC)", "TWO-WAY", "MF/HF", "MF/HF(DSC)"]:
+        
+        if output > 500:
+            calculated_value = 70
+        else:
+             calculated_value = round(43 + 10 * math.log10(output), 0)
+             calculated_value1 = math.log10(output)
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>불요파: -{calculated_value}dBc 이상(43+10*log10*{output})</p>", unsafe_allow_html=True)
+
+    if len(waveform) >= 2:
+        second_last_char = waveform[-2]
     else:
-        st.write(f"현재 주파수: {frequency} Hz, 현재 출력: {output} W (조건 불만족)")
+        second_last_char = None  # 길이가 부족할 경우 기본값 설정
+
+    # 94.간이무선국 조건 확인
+    if category == "94.간이무선국" and second_last_char == '1':
+        left_three_chars = waveform[:3]  # 좌측 3글자 추출
+        if left_three_chars == "8k5":
+            result_value = 50 + 10 * math.log10(output)
+            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파: {result_value:.1f}dBc</p>", unsafe_allow_html=True)
+        elif left_three_chars == "4k0":
+            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파:     (1) 9 kHz 이상 1 GHz 미만의 주파수에서 100 kHz 분해대역폭으로 측정한 경우 -36 dBm 이하 (2) 1 GHz 이상 4 GHz 미만의 주파수에서 1 MHz 분해대역폭으로 측정한 경우 -30 dBm 이하</p>", unsafe_allow_html=True)
+
 
 
 
@@ -339,7 +435,12 @@ def main():
     calculate_button()
     display_results(category, subcategory, output, frequency, waveform)
 
-
+    st.session_state.category = category
+    st.session_state.subcategory = subcategory
+    st.session_state.output = output
+    st.session_state.frequency = frequency
+    st.session_state.waveform = waveform
+    
    # 계산기 표시 제어 버튼
     if st.button('계산기 열기'):
         st.session_state.show_calculators = True
