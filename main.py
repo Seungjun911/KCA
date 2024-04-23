@@ -535,6 +535,19 @@ def watt_to_dbm(watt):
         return '0'
 
 
-
+def version():
+    st.markdown("""
+    <style>
+        .version-info {
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            color: gray;
+            font-size: 15px;
+        }
+    </style>
+    <div class="version-info">ver.1.01/2024.04.23</div>
+    """, unsafe_allow_html=True)
 if __name__ == "__main__":
     main()
+    version()
