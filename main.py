@@ -258,13 +258,17 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
     if subcategory == 'EPIRB':
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: 기준없음(측정값 입력)", unsafe_allow_html=True )
 
-    if category == "92.아마추어국" and 100000000 < frequency <= 470000000 and output > 1:
-        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±1000Hz(1W초과)</p>", unsafe_allow_html=True)
+    if category == "92.아마추어국" and 1606500 < frequency <= 100000000 :
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±500Hz</p>", unsafe_allow_html=True)
+
+
+    if category == "92.아마추어국" and 470000000 < frequency <= 2450000000:
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±500Hz</p>", unsafe_allow_html=True)
 
     if category == "92.아마추어국" and 100000000 < frequency <= 470000000 and output <= 1:
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±500Hz(1W이하)</p>", unsafe_allow_html=True)
 
-    if category == "94.간이무선국" and second_last_char == '1' and 138000000 < frequency <= 174000000:
+    if category == "94.간이무선국"and 138000000 < frequency <= 174000000:
         if output <= 2:
             result_value = 6
         else:
@@ -272,13 +276,18 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
         final_result = frequency * result_value / 1000000
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>{result_value}</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
 
-    if category == "94.간이무선국" and second_last_char == '1' and 335400000 < frequency <= 470000000:
+    if category == "94.간이무선국"and 335400000 < frequency <= 470000000:
         if output <= 2:
             result_value = 4
         else:
             result_value = 3
         final_result = frequency * result_value / 1000000
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>{result_value}</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+
+    if category == "94.간이무선국" and 4000000 < frequency <= 100000000:
+        final_result = frequency * 50 / 1000000
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>50</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
+
 
     if category == "94.간이무선국" and 200000000 < frequency <= 335000000:
         final_result = frequency * 20 / 1000000
@@ -339,17 +348,75 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
         second_last_char = None  # 길이가 부족할 경우 기본값 설정
 
     # 94.간이무선국 조건 확인
-    if category == "94.간이무선국" and second_last_char == '1':
-        left_three_chars = waveform[:3]  # 좌측 3글자 추출
+    if category == "94.간이무선국" and second_last_char == '1' :
+        left_three_chars = waveform[:3].upper()  # 좌측 3글자 추출
         if left_three_chars == "8k5":
             result_value = 50 + 10 * math.log10(output)
-            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파: {result_value:.1f}dBc</p>", unsafe_allow_html=True)
+            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파: {result_value:.1f}dBc(50+10*log10*{output}</p>", unsafe_allow_html=True)
         elif left_three_chars == "4k0":
-            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파:     (1) 9 kHz 이상 1 GHz 미만의 주파수에서 100 kHz 분해대역폭으로 측정한 경우 -36 dBm 이하 (2) 1 GHz 이상 4 GHz 미만의 주파수에서 1 MHz 분해대역폭으로 측정한 경우 -30 dBm 이하</p>", unsafe_allow_html=True)
+            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파:<br>(1) 9 kHz 이상 1 GHz 미만의 주파수에서 100 kHz 분해대역폭으로 측정한 경우 -36 dBm 이하 <br>(2) 1 GHz 이상 4 GHz 미만의 주파수에서 1 MHz 분해대역폭으로 측정한 경우 -30 dBm 이하</p>", unsafe_allow_html=True)
+
+        elif category == "94.간이무선국" and (second_last_char == '2' or second_last_char == '3'):
+            calculated_value = round(43 + 10 * math.log10(output), 0)
+            st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>불요파: -{calculated_value}dBc 이상(43+10*log10*{output})</p>", unsafe_allow_html=True)
+
+        elif subcategory == 'AIS':
+            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파:<br>(1) 9 kHz 이상 1 GHz 미만의 주파수에서 100 kHz 분해대역폭으로 측정한 경우 -36 dBm 이하 <br>(2) 1 GHz 이상 4 GHz 미만의 주파수에서 1 MHz 분해대역폭으로 측정한 경우 -30 dBm 이하</p>", unsafe_allow_html=True)
 
 
+    if subcategory == 'AIS':
+      st.write(f"<p style='font-size: 20px; font-weight: bold;'>부차적전파발사: -57dBc이하</p>", unsafe_allow_html=True)
+    elif subcategory in ['마을방송', 'EPIRB']:
+      st.write(f"<p style='font-size: 20px; font-weight: bold;'>부차적전파발사: 해당없음</p>", unsafe_allow_html=True)
+    else:
+      st.write(f"<p style='font-size: 20px; font-weight: bold;'>부차적전파발사: -54dBc이하</p>", unsafe_allow_html=True)
+###변조도
+    last_three_chars = waveform[-3:].upper()
+
+    if last_three_chars == 'A3E' or last_three_chars == 'H3E':
+    # Streamlit을 사용하여 특정 스타일과 함께 메시지 표시
+      st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>변조도: -9.12dBm(70퍼센트)이상</p>", unsafe_allow_html=True)
 
 
+##주파수편이
+# waveform에서 우측과 좌측 세 문자를 추출하고 대문자로 변환
+    right_three_chars = waveform[-3:].upper()
+    left_three_chars = waveform[:3].upper()
+
+# 1차 조건: 특정 변조 타입 확인
+    if right_three_chars in ['F1D', 'G1D', 'F2D', 'G2D', 'F3E', 'G3E']:
+    # 2차 조건: 좌측 세 문자에 따른 주파수 편이
+        if left_three_chars == '16K':
+          st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편이: 5KHz 이내</p>", unsafe_allow_html=True)
+        elif left_three_chars == '8K5':
+          st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편이: 2.5KHz 이내</p>", unsafe_allow_html=True)
+
+        elif subcategory in ["VHF(DSC)", "TWO-WAY"]:
+          st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편이: 5KHz 이내</p>", unsafe_allow_html=True)
+
+        elif subcategory in ["EPIRB"]:
+          st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>배터리유효기간 입력<br>이탈기유효기간 입력</p>", unsafe_allow_html=True)
+###반송파억압비
+    if len(waveform) >= 3 and waveform[-3].upper() == 'J':
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>반송파억압비: -40dBc 이상</p>", unsafe_allow_html=True)
+        
+###전력저하장치
+# category가 '41.선박국' 또는 '42.의무선박국'이고, output이 75를 초과할 경우
+    if (category == "41.선박국" or category == "42.의무선박국") and output > 75:
+      st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>안테나전력 저하장치: O</p>", unsafe_allow_html=True)
+        
+    
+    
+###인접채널누설비
+    if category == "94.간이무선국" and right_three_chars in ["F1D", "F1E"]:
+    # waveform에서 좌측과 우측 3글자 추출
+    
+    # 좌측 3글자에 따라 조건 분기
+        if left_three_chars == "8K5":
+          st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>인접채널누설비: -60dBc 이상</p>", unsafe_allow_html=True)
+        elif left_three_chars == "4K0":
+          st.markdown(f"<p style='font-size: 20px; font-weight: bold;'><br>(1) 지정주파수로부터 ±6.25 ㎑ 떨어진 주파수에서 100 ㎐ 분해대역폭으로 측정한 경우 60 dB<br>(2) 지정주파수로부터 ±12.5 ㎑ 떨어진 주파수에서 100㎐ 분해대역폭으로 측정한 경우 70 dB</p>", unsafe_allow_html=True)
+        
 def format_frequency(frequency):
     try:
         frequency_value = int(frequency)
