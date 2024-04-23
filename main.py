@@ -540,7 +540,7 @@ def version():
     <style>
         .version-info {
             position: fixed;
-            right: 10px;
+            left: 10px;
             bottom: 10px;
             color: gray;
             font-size: 15px;
