@@ -1,4 +1,6 @@
 import streamlit as st
+import yaml
+import streamlit_authenticator as stauth
 import math
 
 def setup_initial_state():
@@ -159,6 +161,10 @@ def Contrast(category, subcategory, output):
     # 안테나에 대한 정보
     if category in ['41.선박국', '42.의무선박국', '44.육상이동국', '92.아마추어국', '94.간이무선국']:
         st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 안테나</p>", unsafe_allow_html=True)
+
+    # 안전시설에 대한 정보
+    if category in ['41.선박국', '42.의무선박국', '44.육상이동국', '92.아마추어국', '94.간이무선국']:
+        st.markdown("<p style='font-size: 20px; font-weight: bold;'>※ 안전시설</p>", unsafe_allow_html=True)
 
     # 보호장치에 대한 정보 (10W 초과 시)
     if output > 10:
@@ -343,27 +349,26 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>불요파: -{calculated_value}dBc 이상(43+10*log10*{output})</p>", unsafe_allow_html=True)
 
     if len(waveform) >= 2:
-        second_last_char = waveform[-2]
+      second_last_char = waveform[-2].upper()  # 대소문자 구분 없이 처리
     else:
-        second_last_char = None  # 길이가 부족할 경우 기본값 설정
+      second_last_char = None  # 길이가 부족할 경우 기본값 설정
 
-    # 94.간이무선국 조건 확인
-    if category == "94.간이무선국" and second_last_char == '1' :
-        left_three_chars = waveform[:3].upper()  # 좌측 3글자 추출
-        if left_three_chars == "8k5":
+# 94.간이무선국 조건 확인
+    if category == "94.간이무선국":
+        if second_last_char == '1':
+          left_three_chars = waveform[:3].upper()  # 좌측 3글자 추출
+        if left_three_chars == "8K5" and output > 0:  # output이 양수인 경우만 계산
             result_value = 50 + 10 * math.log10(output)
-            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파: {result_value:.1f}dBc(50+10*log10*{output}</p>", unsafe_allow_html=True)
-        elif left_three_chars == "4k0":
+            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파: {result_value:.1f}dBc (50+10*log10*{output})</p>", unsafe_allow_html=True)
+        elif left_three_chars == "4K0":
             st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파:<br>(1) 9 kHz 이상 1 GHz 미만의 주파수에서 100 kHz 분해대역폭으로 측정한 경우 -36 dBm 이하 <br>(2) 1 GHz 이상 4 GHz 미만의 주파수에서 1 MHz 분해대역폭으로 측정한 경우 -30 dBm 이하</p>", unsafe_allow_html=True)
-
-        elif category == "94.간이무선국" and (second_last_char == '2' or second_last_char == '3'):
+    elif second_last_char == '2' or second_last_char == '3':
+        if output > 0:  # output이 양수인 경우만 계산
             calculated_value = round(43 + 10 * math.log10(output), 0)
-            st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>불요파: -{calculated_value}dBc 이상(43+10*log10*{output})</p>", unsafe_allow_html=True)
-
-        elif subcategory == 'AIS':
-            st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파:<br>(1) 9 kHz 이상 1 GHz 미만의 주파수에서 100 kHz 분해대역폭으로 측정한 경우 -36 dBm 이하 <br>(2) 1 GHz 이상 4 GHz 미만의 주파수에서 1 MHz 분해대역폭으로 측정한 경우 -30 dBm 이하</p>", unsafe_allow_html=True)
-
-
+            st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>불요파: -{calculated_value}dBc 이상 (43+10*log10*{output})</p>", unsafe_allow_html=True)
+            
+            
+            
     if subcategory == 'AIS':
       st.write(f"<p style='font-size: 20px; font-weight: bold;'>부차적전파발사: -57dBc이하</p>", unsafe_allow_html=True)
     elif subcategory in ['마을방송', 'EPIRB']:
@@ -548,6 +553,33 @@ def version():
     </style>
     <div class="version-info">ver.1.01/2024.04.23</div>
     """, unsafe_allow_html=True)
+    
+def login():
+    
+        # yaml 파일 데이터로 객체 생성
+        with open('config.yaml') as file:
+           config = yaml.load(file, Loader=stauth.SafeLoader)   
+           
+        authenticator = stauth.Authenticate(
+            config['credentials'],
+            config['cookie']['name'],
+            config['cookie']['key'],
+            config['cookie']['expiry_days'],
+            config['preauthorized']
+        )
+ 
+        name, authentication_status, username = authenticator.login()
+        
+
+        if authentication_status:
+            authenticator.logout("Logout","sidebar")
+            return True
+    
+## 로그인 위젯 렌더링
+## log(in/out)(로그인 위젯 문구, 버튼 위치)
+## 버튼 위치 = "main" or "sidebar"
+
+    
 if __name__ == "__main__":
-    main()
-    version()
+        main()
+        version()
