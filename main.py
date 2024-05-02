@@ -53,6 +53,8 @@ def convert_to_hz(value, unit):
 
 def input_output_frequency_waveform():
     output = st.number_input('출력값을 입력하세요:', value=1.0, step=1.0, format="%.1f")
+    options = ["직접입력 or 검색","3K20A3X","4K0F1E", "8K5F1E", "8K5F2E", "8K5F3E","16K0G2B","16K0G3E", "16K0F1E", "16K0F2E", "16K0F3E","16K0F1D", "20K0G1B",]
+    waveform = st.selectbox("전파형식(예:8k5f3e 등)", options)
 
     initial_frequency = st.number_input('센터주파수를 입력하세요:', value=0.0, step=1.0, format="%.1f")
 
@@ -82,7 +84,8 @@ def input_output_frequency_waveform():
     frequency_display = format_frequency(frequency)
     st.markdown(f"주파수: <span style='color: red;'>{frequency_display}</span>", unsafe_allow_html=True)
 
-    waveform = st.text_input('전파형식(예:8k5f3e 등)', max_chars=8)
+
+
 
     return output, frequency, waveform
 
@@ -497,7 +500,6 @@ def setup_initial_state():
         st.session_state['show_results'] = False
 def main():
 
-    
     st.title('일반무선국 기술기준 Helper')
     setup_initial_state()
     category = select_category()
