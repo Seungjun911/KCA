@@ -370,11 +370,11 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
             
             
     if subcategory == 'AIS':
-      st.write(f"<p style='font-size: 20px; font-weight: bold;'>부차적전파발사: -57dBc이하</p>", unsafe_allow_html=True)
+      st.write(f"<p style='font-size: 20px; font-weight: bold;'>부차적전파발사: -57dBm이하</p>", unsafe_allow_html=True)
     elif subcategory in ['마을방송', 'EPIRB']:
       st.write(f"<p style='font-size: 20px; font-weight: bold;'>부차적전파발사: 해당없음</p>", unsafe_allow_html=True)
     else:
-      st.write(f"<p style='font-size: 20px; font-weight: bold;'>부차적전파발사: -54dBc이하</p>", unsafe_allow_html=True)
+      st.write(f"<p style='font-size: 20px; font-weight: bold;'>부차적전파발사: -54dBm이하</p>", unsafe_allow_html=True)
 ###변조도
     last_three_chars = waveform[-3:].upper()
 
