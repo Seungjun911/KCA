@@ -362,7 +362,7 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
             st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파: {result_value:.1f}dBc (50+10*log10*{output})</p>", unsafe_allow_html=True)
         elif left_three_chars == "4K0":
             st.write(f"<p style='font-size: 20px; font-weight: bold;'>불요파:<br>(1) 9 kHz 이상 1 GHz 미만의 주파수에서 100 kHz 분해대역폭으로 측정한 경우 -36 dBm 이하 <br>(2) 1 GHz 이상 4 GHz 미만의 주파수에서 1 MHz 분해대역폭으로 측정한 경우 -30 dBm 이하</p>", unsafe_allow_html=True)
-    elif second_last_char == '2' or second_last_char == '3':
+    elif category == "94.간이무선국" and (second_last_char == '2' or second_last_char == '3'):
         if output > 0:  # output이 양수인 경우만 계산
             calculated_value = round(43 + 10 * math.log10(output), 0)
             st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>불요파: -{calculated_value}dBc 이상 (43+10*log10*{output})</p>", unsafe_allow_html=True)
