@@ -553,7 +553,7 @@ def version():
             font-size: 15px;
         }
     </style>
-    <div class="version-info">ver.1.01/2024.04.23</div>
+    <div class="version-info">ver.1.03/2024.05.02</div>
     """, unsafe_allow_html=True)
     
 def login():
