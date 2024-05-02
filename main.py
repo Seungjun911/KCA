@@ -53,7 +53,7 @@ def convert_to_hz(value, unit):
 
 def input_output_frequency_waveform():
     output = st.number_input('출력값을 입력하세요:', value=1.0, step=1.0, format="%.1f")
-    options = ["직접입력 or 검색","3K20A3X","4K0F1E", "8K5F1E", "8K5F2E", "8K5F3E","16K0G2B","16K0G3E", "16K0F1E", "16K0F2E", "16K0F3E","16K0F1D", "20K0G1B",]
+    options = ["직접입력 or 검색","2K80H3E","2K80J3E","3K20A3X","4K0F1E", "8K5F1E", "8K5F2E", "8K5F3E","16K0G2B","16K0G3E", "16K0F1E", "16K0F2E", "16K0F3E","16K0F1D", "20K0G1B",]
     waveform = st.selectbox("전파형식(예:8k5f3e 등)", options)
 
     initial_frequency = st.number_input('센터주파수를 입력하세요:', value=0.0, step=1.0, format="%.1f")
@@ -142,7 +142,7 @@ def Contrast(category, subcategory, output):
     text-align: center;
 }
 </style>
-<div class="centered-success">✅ 대조 결과 ✅</div>
+<div class="centered-success">✅ 대조 항목 ✅</div>
 """, unsafe_allow_html=True)
 
     # 시설자에 대한 정보
@@ -204,7 +204,7 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
     font-weight: bold;
 }
 </style>
-<div class="centered-success">✅ 성능 결과 ✅</div>
+<div class="centered-success">✅ 성능 수치 ✅</div>
 """, unsafe_allow_html=True)
     # waveform 길이 확인
     if len(waveform) >= 2:
@@ -328,7 +328,7 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±10Hz(DSC)", unsafe_allow_html=True )
 
     if subcategory == 'MF/HF'and 4000000 < frequency <= 28500000:
-        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±50Hz(DSC)", unsafe_allow_html=True )
+        st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±50Hz", unsafe_allow_html=True )
 
     if subcategory == 'MF/HF'and 1606500 < frequency <= 4000000:
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±40Hz(DSC)", unsafe_allow_html=True )
@@ -391,7 +391,7 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
     left_three_chars = waveform[:3].upper()
 
 # 1차 조건: 특정 변조 타입 확인
-    if right_three_chars in ['F1D', 'G1D', 'F2D', 'G2D', 'F3E', 'G3E']:
+    if right_three_chars in ['F2D', 'G2D', 'F3E', 'G3E']:
     # 2차 조건: 좌측 세 문자에 따른 주파수 편이
         if left_three_chars == '16K':
           st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편이: 5KHz 이내</p>", unsafe_allow_html=True)
@@ -474,6 +474,20 @@ def get_waveform_description(waveform):
 def calculate_button():
     if st.button('결과 열기', key='open'):
         st.session_state.show_results = True
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 ###############결과 화면
 def display_results(category, subcategory, output, frequency, waveform):
     if st.session_state.show_results:
@@ -513,7 +527,7 @@ def main():
     st.session_state.output = output
     st.session_state.frequency = frequency
     st.session_state.waveform = waveform
-    
+
    # 계산기 표시 제어 버튼
     if st.button('계산기 열기'):
         st.session_state.show_calculators = True
