@@ -279,9 +279,9 @@ def Performance(category, subcategory, output, frequency, waveform, extracted_wa
 
     if category == "94.간이무선국"and 138000000 < frequency <= 174000000:
         if output <= 2:
-            result_value = 6
-        else:
             result_value = 8
+        else:
+            result_value = 6
         final_result = frequency * result_value / 1000000
         st.markdown(f"<p style='font-size: 20px; font-weight: bold;'>주파수편차: ±{final_result}Hz(<sup>{result_value}</sup>&frasl;<sub>1000000</sub>)</p>", unsafe_allow_html=True)
 
